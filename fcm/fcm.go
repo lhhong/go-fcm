@@ -8,9 +8,9 @@ import (
 )
 
 // Interface defines the data type that should be used with fcm. The data type is for a single data point and should implement the following:
-// Multiply: Scale a data point to a given weight
-// Add: Add 2 data points together
-// Norm: Calculate distance measure between 2 data points
+// Multiply: Scale a data point to a given weight.
+// Add: Add 2 data points together.
+// Norm: Calculate distance measure between 2 data points.
 type Interface interface {
 	Multiply(weight float64) Interface
 	Add(v Interface) Interface
@@ -23,7 +23,7 @@ type Interface interface {
 // epsilon determines the degree of convergence, where the algorithm terminates if change in cluster weights (measured by norm) < epsilon.
 // numCentroids is the number of centroids to perform fcm with.
 // It returns a slice of Interface and weight matrix where the first dimension refers to each centroid and the second dimension refering each data point,
-// indicating weight of the data point belonging to the centroid
+// indicating weight of the data point belonging to the centroid.
 func Cluster(vals []Interface, fuzziness float64, epsilon float64, numCentroids int) ([]Interface, [][]float64) {
 
 	centroids := make([]Interface, 0, numCentroids)
