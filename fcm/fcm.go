@@ -26,14 +26,9 @@ type Interface interface {
 // indicating weight of the data point belonging to the centroid.
 func Cluster(vals []Interface, fuzziness float64, epsilon float64, numCentroids int) ([]Interface, [][]float64) {
 
-	centroids := make([]Interface, 0, numCentroids)
+	centroids := make([]Interface, numCentroids)
 
-	// TODO: Use map generation if ratio of numCentroids/len(val) is too small
-	randIndices := rand.Perm(len(vals))[:numCentroids]
-
-	for _, i := range randIndices {
-		centroids = append(centroids, vals[i])
-	}
+	initCentroids(vals, numCentroids, centroids)
 
 	return centroids, ClusterGivenCentroids(vals, fuzziness, epsilon, centroids)
 }
@@ -52,6 +47,28 @@ func ClusterGivenCentroids(vals []Interface, fuzziness float64, epsilon float64,
 	}
 
 	return clusterWeights
+}
+
+func initCentroids(vals []Interface, numCentroids int, centroids []Interface) {
+
+	if len(vals) < 10000 || float64(numCentroids)/float64(len(vals)) > 0.2 {
+		randIndices := rand.Perm(len(vals))[:numCentroids]
+
+		for i, j := range randIndices {
+			centroids[i] = vals[j]
+		}
+	} else {
+		seen := map[int]bool{}
+
+		for i := 0; i < numCentroids; i++ {
+			randIndex := rand.Intn(len(vals))
+			for _, present := seen[randIndex]; present; {
+				randIndex = rand.Intn(len(vals))
+			}
+			seen[randIndex] = true
+			centroids[i] = vals[randIndex]
+		}
+	}
 }
 
 func evaluateWeights(vals []Interface, fuzziness float64, centroids []Interface, clusterWeights [][]float64) float64 {
