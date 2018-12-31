@@ -1,3 +1,4 @@
+// Package fcm performs Fuzzy C-Means clustering on custom data types
 package fcm
 
 import (
@@ -6,14 +7,23 @@ import (
 	"math/rand"
 )
 
-// Interface Define the operations within values
+// Interface defines the data type that should be used with fcm. The data type is for a single data point and should implement the following:
+// Multiply: Scale a data point to a given weight
+// Add: Add 2 data points together
+// Norm: Calculate distance measure between 2 data points
 type Interface interface {
 	Multiply(weight float64) Interface
 	Add(v Interface) Interface
 	Norm(v Interface) float64
 }
 
-// Cluster Perform FCM with randomly initialized centroids
+// Cluster performs FCM with randomly initialized centroids.
+// vals is the slice of data points to be clustered.
+// fuzziness is the hyperparameter (commonly known as m) determining level of fuzziness and should be > 1.
+// epsilon determines the degree of convergence, where the algorithm terminates if change in cluster weights (measured by norm) < epsilon.
+// numCentroids is the number of centroids to perform fcm with.
+// It returns a slice of Interface and weight matrix where the first dimension refers to each centroid and the second dimension refering each data point,
+// indicating weight of the data point belonging to the centroid
 func Cluster(vals []Interface, fuzziness float64, epsilon float64, numCentroids int) ([]Interface, [][]float64) {
 
 	centroids := make([]Interface, 0, numCentroids)
@@ -28,7 +38,8 @@ func Cluster(vals []Interface, fuzziness float64, epsilon float64, numCentroids 
 	return centroids, ClusterGivenCentroids(vals, fuzziness, epsilon, centroids)
 }
 
-// ClusterGivenCentroids Perform FCM with manually initialized centroids
+// ClusterGivenCentroids performs FCM with manually initialized centroids.
+// Instead of numCentroids, the initial centroids will be passed in via centroids.
 func ClusterGivenCentroids(vals []Interface, fuzziness float64, epsilon float64, centroids []Interface) [][]float64 {
 
 	clusterWeights := make([][]float64, len(centroids))
