@@ -2,7 +2,7 @@
 Fuzzy C-Means Clustering for Golang allowing custom data types
 
 ## Usage
-```
+```go
 import(
     "math"
     "github.com/lhhong/go-fcm/fcm"
