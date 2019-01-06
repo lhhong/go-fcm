@@ -71,21 +71,31 @@ func initCentroids(vals []Interface, numCentroids int, centroids []Interface) {
 	}
 }
 
+func evaluateWeightsForOneVal(val Interface, fuzziness float64, centroids []Interface) []float64 {
+
+	weights := make([]float64, len(centroids))
+	for j, c := range centroids {
+		denominator := 0.0
+		for _, c2 := range centroids {
+			denominator += math.Pow((val.Norm(c) / val.Norm(c2)), 2.0/(fuzziness-1.0))
+		}
+		if math.IsNaN(denominator) {
+			denominator = 1.0
+		}
+		newWeights := 1.0 / denominator
+		weights[j] = newWeights
+	}
+	return weights
+}
+
 func evaluateWeights(vals []Interface, fuzziness float64, centroids []Interface, clusterWeights [][]float64) float64 {
 
 	squareSum := 0.0
-	for j, c := range centroids {
-		for i, x := range vals {
-			denominator := 0.0
-			for _, c2 := range centroids {
-				denominator += math.Pow((x.Norm(c) / x.Norm(c2)), 2.0/(fuzziness-1.0))
-			}
-			if math.IsNaN(denominator) {
-				denominator = 1.0
-			}
-			newWeights := 1.0 / denominator
-			squareSum += math.Pow((clusterWeights[j][i] - newWeights), 2.0)
-			clusterWeights[j][i] = newWeights
+	for i, val := range vals {
+		weights := evaluateWeightsForOneVal(val, fuzziness, centroids)
+		for j, w := range weights {
+			squareSum += math.Pow((clusterWeights[j][i] - w), 2.0)
+			clusterWeights[j][i] = w
 		}
 	}
 	log.Printf("epsilon: %f", math.Sqrt(squareSum))
