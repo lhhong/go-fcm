@@ -71,7 +71,8 @@ func initCentroids(vals []Interface, numCentroids int, centroids []Interface) {
 	}
 }
 
-func evaluateWeightsForOneVal(val Interface, fuzziness float64, centroids []Interface) []float64 {
+// EvaluateWeightsForOneVal calcuates c means weight of a foreign value for each of the centroids
+func EvaluateWeightsForOneVal(val Interface, centroids []Interface, fuzziness float64) []float64 {
 
 	weights := make([]float64, len(centroids))
 	for j, c := range centroids {
@@ -92,7 +93,7 @@ func evaluateWeights(vals []Interface, fuzziness float64, centroids []Interface,
 
 	squareSum := 0.0
 	for i, val := range vals {
-		weights := evaluateWeightsForOneVal(val, fuzziness, centroids)
+		weights := EvaluateWeightsForOneVal(val, centroids, fuzziness)
 		for j, w := range weights {
 			squareSum += math.Pow((clusterWeights[j][i] - w), 2.0)
 			clusterWeights[j][i] = w
